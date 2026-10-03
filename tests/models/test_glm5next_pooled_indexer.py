@@ -29,6 +29,7 @@ from vllm.triton_utils import triton
 from vllm.v1.attention.backends.mla.b12x_mla_sparse import (
     B12xGLM5NextMLASparseMetadataBuilder,
     B12xMLASparseMetadata,
+    _glm_device_token_metadata_kernel,
 )
 from vllm.v1.attention.backends.utils import get_dcp_local_seq_lens
 from vllm.v1.kv_cache_interface import MLAAttentionSpec
@@ -54,6 +55,45 @@ def _hadamard128(x: torch.Tensor) -> torch.Tensor:
         a, b = x[:, 0], x[:, 1]
         x = torch.stack((a + b, a - b), dim=1).reshape(128)
     return x / (128**0.5)
+
+
+def test_glm53_metadata_reuses_jit_across_prompt_lengths() -> None:
+    """Unseen prompt remainders must not compile a new metadata kernel."""
+    device = _require_glm_gpu()
+    builder = object.__new__(B12xGLM5NextMLASparseMetadataBuilder)
+    builder.dcp_world_size = 1
+    builder.dcp_rank = 0
+    builder.cp_kv_cache_interleave_size = 1
+    builder.req_id_per_token_buffer = torch.empty(
+        4097, dtype=torch.int32, device=device
+    )
+    builder.cache_seq_lens_per_token_buffer = torch.empty_like(
+        builder.req_id_per_token_buffer
+    )
+    starts = torch.zeros(2, dtype=torch.int32, device=device)
+    lengths = torch.zeros(1, dtype=torch.int32, device=device)
+    cache = _glm_device_token_metadata_kernel.device_caches[device.index][0]
+    cache.clear()
+    for count in (1, 0, 2, 3, 15, 16, 17, 127, 128, 129, 511, 512, 513, 4096, 4097):
+        starts[1] = count
+        lengths[0] = 8192 + count
+        builder.req_id_per_token_buffer.fill_(-1)
+        builder.cache_seq_lens_per_token_buffer.fill_(-1)
+        common = SimpleNamespace(
+            num_actual_tokens=count,
+            num_reqs=1,
+            query_start_loc=starts,
+            seq_lens=lengths,
+        )
+        request_ids = builder._build_req_id_per_token(common)
+        expected = torch.arange(8193, 8193 + count, dtype=torch.int32, device=device)
+        torch.testing.assert_close(request_ids, torch.zeros_like(request_ids))
+        torch.testing.assert_close(
+            builder.cache_seq_lens_per_token_buffer[:count], expected
+        )
+        assert torch.all(builder.req_id_per_token_buffer[count:] == -1)
+        assert torch.all(builder.cache_seq_lens_per_token_buffer[count:] == -1)
+        assert len(cache) == 1
 
 
 @pytest.mark.parametrize("rows", [1, 4, 5, 31, 32, 33, 128])

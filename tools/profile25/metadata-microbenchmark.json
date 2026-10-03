@@ -1,0 +1,290 @@
+{
+  "baseline": {
+    "rows": [
+      {
+        "repetition": 0,
+        "tokens": 1,
+        "wall_ms": 441.03185800486244,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 521,
+        "wall_ms": 31.877238012384623,
+        "compiled_variants": 2
+      },
+      {
+        "repetition": 0,
+        "tokens": 547,
+        "wall_ms": 31.397474987898022,
+        "compiled_variants": 3
+      },
+      {
+        "repetition": 0,
+        "tokens": 569,
+        "wall_ms": 30.007883004145697,
+        "compiled_variants": 4
+      },
+      {
+        "repetition": 0,
+        "tokens": 593,
+        "wall_ms": 38.332634983817115,
+        "compiled_variants": 5
+      },
+      {
+        "repetition": 0,
+        "tokens": 617,
+        "wall_ms": 30.712687002960593,
+        "compiled_variants": 6
+      },
+      {
+        "repetition": 0,
+        "tokens": 641,
+        "wall_ms": 29.08470999682322,
+        "compiled_variants": 7
+      },
+      {
+        "repetition": 0,
+        "tokens": 673,
+        "wall_ms": 29.332551988773048,
+        "compiled_variants": 8
+      },
+      {
+        "repetition": 0,
+        "tokens": 701,
+        "wall_ms": 29.658440995262936,
+        "compiled_variants": 9
+      },
+      {
+        "repetition": 0,
+        "tokens": 733,
+        "wall_ms": 30.634814000222832,
+        "compiled_variants": 10
+      },
+      {
+        "repetition": 0,
+        "tokens": 769,
+        "wall_ms": 30.920945020625368,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 1,
+        "wall_ms": 0.036384008126333356,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 521,
+        "wall_ms": 0.02145601320080459,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 547,
+        "wall_ms": 0.01742399763315916,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 569,
+        "wall_ms": 0.016303994925692677,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 593,
+        "wall_ms": 0.015664001693949103,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 617,
+        "wall_ms": 0.015344005078077316,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 641,
+        "wall_ms": 0.015199999324977398,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 673,
+        "wall_ms": 0.014416000340133905,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 701,
+        "wall_ms": 0.015519995940849185,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 733,
+        "wall_ms": 0.013023993233218789,
+        "compiled_variants": 11
+      },
+      {
+        "repetition": 1,
+        "tokens": 769,
+        "wall_ms": 0.01230402267538011,
+        "compiled_variants": 11
+      }
+    ],
+    "graph_kernel_us": [
+      1.1032533645629883,
+      0.8300800124804179,
+      0.8194133142630259,
+      0.8168533444404602,
+      0.8186666667461395
+    ],
+    "median_graph_kernel_us": 0.8194133142630259
+  },
+  "fixed": {
+    "rows": [
+      {
+        "repetition": 0,
+        "tokens": 1,
+        "wall_ms": 444.64691702160053,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 521,
+        "wall_ms": 0.11022499529644847,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 547,
+        "wall_ms": 0.07660800474695861,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 569,
+        "wall_ms": 0.018368999008089304,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 593,
+        "wall_ms": 0.015183992218226194,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 617,
+        "wall_ms": 0.013456010492518544,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 641,
+        "wall_ms": 0.012608012184500694,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 673,
+        "wall_ms": 0.012784003047272563,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 701,
+        "wall_ms": 0.012336007785052061,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 733,
+        "wall_ms": 0.012639997294172645,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 0,
+        "tokens": 769,
+        "wall_ms": 0.01217599492520094,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 1,
+        "wall_ms": 0.014240009477362037,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 521,
+        "wall_ms": 0.012656004400923848,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 547,
+        "wall_ms": 0.012208009138703346,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 569,
+        "wall_ms": 0.012367992894724011,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 593,
+        "wall_ms": 0.012144009815528989,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 617,
+        "wall_ms": 0.011855998309329152,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 641,
+        "wall_ms": 0.012176024029031396,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 673,
+        "wall_ms": 0.01188801252283156,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 701,
+        "wall_ms": 0.012303993571549654,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 733,
+        "wall_ms": 0.01196801895275712,
+        "compiled_variants": 1
+      },
+      {
+        "repetition": 1,
+        "tokens": 769,
+        "wall_ms": 0.012112024705857038,
+        "compiled_variants": 1
+      }
+    ],
+    "graph_kernel_us": [
+      1.1552000045776367,
+      0.8169599870840708,
+      0.8056533336639404,
+      0.8040533463160197,
+      0.8045866588751475
+    ],
+    "median_graph_kernel_us": 0.8056533336639404
+  }
+}
