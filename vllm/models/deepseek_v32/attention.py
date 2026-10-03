@@ -165,6 +165,7 @@ class DeepseekV32Indexer(nn.Module):
             dcp_world_size=dcp_world_size,
             cp_kv_cache_interleave_size=cp_kv_cache_interleave_size,
             skip_topk_buffer_clear=True,
+            topk_backend=self.indexer_op.topk_backend,
         )
 
 
