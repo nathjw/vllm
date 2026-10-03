@@ -12,3 +12,8 @@ notices and dependency licenses.
 
 Performance work is developed on a separate branch and evaluated using the
 unchanged NVFP4-Spark checkpoint, MTP3 target verification and FP8 KV format.
+
+On `profile25/gb10-perf`, the only additional inference change is the metadata
+kernel specialization fix at `88ea13c`. See [the measurements and qualification
+record](metadata-jit.md). It removes first-use compilation stalls without
+changing model arithmetic. It does not establish a sustained TG speedup.
