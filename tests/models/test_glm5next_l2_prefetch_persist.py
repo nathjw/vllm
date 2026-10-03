@@ -46,6 +46,79 @@ def test_invalid_numeric_environment_values_use_defaults(monkeypatch):
     assert l2pf._mb("VLLM_GLM53_L2_PREFETCH_BUDGET_A_MB", "20") == 20_000_000
 
 
+@pytest.mark.parametrize("size", [48, 4096, 4096 * 17 + 48, 50_000_000])
+@pytest.mark.parametrize("budget", [0, 15, 4096, 8_000_000])
+def test_striped_prefetch_partitions_storage_within_budget(size, budget):
+    """A partial cache hint must not overlap or cross the weight allocation."""
+    pointer = 0x10000
+    taken, rest = l2pf.stripe_budget(("weight", pointer, size), budget, 64)
+    assert sum(length for _, _, length in taken) <= budget
+    cursor = pointer
+    for _, start, length in sorted(taken + rest, key=lambda item: item[1]):
+        assert start == cursor
+        assert start % 16 == 0
+        assert length > 0
+        cursor += length
+    assert cursor == pointer + size
+    if size == 50_000_000 and budget == 8_000_000:
+        assert len(taken) == 64
+        assert taken[-1][1] > pointer + size * 0.9
+
+
+def test_flat_prefetch_pieces_never_read_past_a_tail():
+    pieces = l2pf.prefetch_pieces([("weight", 0x10000, 8192 + 35)])
+    assert pieces == [
+        ("weight", 0x10000, 4096),
+        ("weight", 0x11000, 4096),
+        ("weight", 0x12000, 32),
+    ]
+
+
+def test_later_prefetch_window_does_not_repeat_striped_reads(monkeypatch):
+    monkeypatch.setattr(l2pf, "_STRIPES", 64)
+    source = [("projection", 0x10000, 24_000_000)]
+    first, rest = l2pf.take_budget(source, 8_000_000)
+    second, rest = l2pf.take_budget(rest, 6_000_000)
+    assert sum(size for _, _, size in first) <= 8_000_000
+    assert sum(size for _, _, size in second) <= 6_000_000
+    cursor = source[0][1]
+    for _, start, length in sorted(first + second + rest, key=lambda x: x[1]):
+        assert start == cursor
+        cursor += length
+    assert cursor == source[0][1] + source[0][2]
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA device required")
+def test_striped_prefetch_graph_preserves_projection_output(monkeypatch):
+    """Exercise the compiled flat-piece kernel and its side-stream graph join."""
+    monkeypatch.setattr(l2pf, "_STRIPES", 64)
+    monkeypatch.setattr(l2pf, "_compiled", None)
+    monkeypatch.setattr(l2pf, "_compile_failed", False)
+    weight = torch.randn((1024, 2048), dtype=torch.bfloat16, device="cuda")
+    inputs = torch.randn((4, 1024), dtype=weight.dtype, device=weight.device)
+    reference = inputs @ weight
+    original = weight.clone()
+    segment = l2pf.tensor_segment("weight", weight)
+    assert segment is not None
+    plan, _ = l2pf.make_plan([segment], 1_000_000, weight.device)
+    assert plan is not None
+    assert l2pf._get_launcher() is not None
+    prefetcher = l2pf.L2Prefetcher.get(weight.device)
+    prefetcher.issue(plan, 4)
+    prefetcher.join()
+    torch.accelerator.synchronize()
+    graph = torch.cuda.CUDAGraph()
+    with torch.cuda.graph(graph):
+        prefetcher.issue(plan, 4)
+        prefetcher.join()
+        output = inputs @ weight
+    for _ in range(3):
+        graph.replay()
+    torch.accelerator.synchronize()
+    assert torch.equal(weight, original)
+    assert torch.equal(output, reference)
+
+
 def test_prefetch_is_disabled_for_the_entire_breakable_capture(monkeypatch):
     monkeypatch.setattr(
         BreakableCUDAGraphCapture,

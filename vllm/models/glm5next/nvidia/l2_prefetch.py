@@ -32,6 +32,8 @@ Environment:
   VLLM_GLM53_L2_PREFETCH_MAX_TOKENS   only prefetch for batches up to this (256)
   VLLM_GLM53_L2_PREFETCH_BUDGET_{A,B,C,A_MLA}_MB   per-window fill budgets
   VLLM_GLM53_L2_PREFETCH_A_NEXT_MB    next-layer head bytes carried in window A
+  VLLM_GLM53_L2_PREFETCH_STRIPES      spread partial fills across this many
+                                      tensor regions (1: contiguous, default)
   VLLM_GLM53_L2_PREFETCH_PERSIST_MB   persisting-L2 set-aside per rank: "max",
                                       megabytes, or 0 (default)
 
@@ -95,6 +97,7 @@ def _mb(name: str, default: str) -> int:
 
 
 _MAX_TOKENS = _int_env("VLLM_GLM53_L2_PREFETCH_MAX_TOKENS", 256)
+_STRIPES = max(1, _int_env("VLLM_GLM53_L2_PREFETCH_STRIPES", 1))
 
 
 BUDGET_A = _mb("VLLM_GLM53_L2_PREFETCH_BUDGET_A_MB", "20")
@@ -197,6 +200,7 @@ if _CUTE_OK:
             self.chunk_bytes = int(chunk_bytes)
             self.grid = int(grid)
             self.block = int(block)
+            self.flat_ranges = _STRIPES > 1
 
         @cute.jit
         def __call__(self, gSegs: cute.Tensor, stream: CUstream) -> None:
@@ -215,6 +219,17 @@ if _CUTE_OK:
             tid = cutlass.Int64(bidx) * cutlass.Int64(self.block) + cutlass.Int64(tidx)
             nseg = cutlass.Int32(cute.size(gSegs, mode=[0]) // 2)
             policy = _createpolicy_evict_last()
+            if cutlass.const_expr(self.flat_ranges):
+                # The host has split ranges into aligned, bounded pieces.
+                # Each thread issues one piece instead of every thread
+                # walking every range in a fragmented prefetch plan.
+                piece = cutlass.Int32(tid)
+                while piece < nseg:
+                    base = cutlass.Int64(gSegs[2 * piece])
+                    size = cutlass.Int32(gSegs[2 * piece + 1])
+                    _bulk_prefetch_l2(base, size, policy)
+                    piece = piece + cutlass.Int32(stride)
+                return
             s = cutlass.Int32(0)
             while s < nseg:
                 base = cutlass.Int64(gSegs[2 * s])
@@ -265,11 +280,12 @@ def _get_launcher():
 
         _compiled = launch
         logger.info(
-            "[l2_prefetch] CuTe kernel ready (grid=%d block=%d chunk=%d; "
+            "[l2_prefetch] CuTe kernel ready (grid=%d block=%d chunk=%d stripes=%d; "
             "budgets A/B/C/A_mla=%.0f/%.0f/%.0f/%.0f MB)",
             _GRID,
             _BLOCK,
             _CHUNK_BYTES,
+            _STRIPES,
             BUDGET_A / 1e6,
             BUDGET_B / 1e6,
             BUDGET_C / 1e6,
@@ -384,12 +400,51 @@ def take_budget(
             taken.append((name, ptr, nbytes))
             used += nbytes
         else:
+            if _STRIPES > 1:
+                striped, remainder = stripe_budget((name, ptr, nbytes), room, _STRIPES)
+                taken.extend(striped)
+                rest.extend(remainder)
+                used += sum(size for _, _, size in striped)
+                continue
             head = room - (room % _CHUNK_BYTES)
             if head > 0:
                 taken.append((name + "[head]", ptr, head))
                 used += head
             rest.append((name + "[tail]", ptr + head, nbytes - head))
     return taken, rest
+
+
+def stripe_budget(
+    segment: Segment, budget: int, stripes: int
+) -> tuple[list[Segment], list[Segment]]:
+    """Distribute a partial fill across disjoint aligned tensor regions.
+
+    This follows TensorFold's idea of prefetching the heads of multiple weight
+    chunks. Regions here are generic byte ranges, not an EXL3/Q4 layout. The
+    remainder can be scheduled in a later window without duplicate reads.
+    """
+    name, ptr, size = segment
+    count = max(1, min(stripes, size // _CHUNK_BYTES))
+    width = size // count // _CHUNK_BYTES * _CHUNK_BYTES
+    head = max(0, min(width, budget // count // 16 * 16))
+    taken, rest = [], []
+    for index in range(count):
+        offset = index * width
+        length = width if index + 1 < count else size - offset
+        if head:
+            taken.append((f"{name}[stripe{index}]", ptr + offset, head))
+        if length > head:
+            rest.append((f"{name}[tail{index}]", ptr + offset + head, length - head))
+    return taken, rest
+
+
+def prefetch_pieces(segments: list[Segment]) -> list[Segment]:
+    """Split valid ranges into the independent operations issued by the GPU."""
+    return [
+        (name, ptr + offset, min(_CHUNK_BYTES, (size - offset) // 16 * 16))
+        for name, ptr, size in segments
+        for offset in range(0, size - size % 16, _CHUNK_BYTES)
+    ]
 
 
 class L2PrefetchPlan:
@@ -402,7 +457,8 @@ class L2PrefetchPlan:
         self.nseg = len(segments)
         self.total_bytes = sum(s[2] for s in segments)
         self.names = [f"{n}:{b / 1e6:.1f}MB" for n, _, b in segments]
-        flat = [v for _, ptr, nbytes in segments for v in (ptr, nbytes)]
+        pieces = prefetch_pieces(segments) if _STRIPES > 1 else segments
+        flat = [v for _, ptr, nbytes in pieces for v in (ptr, nbytes)]
         self.segs = (
             torch.tensor(flat, dtype=torch.int64, device=device) if flat else None
         )
