@@ -1173,14 +1173,15 @@ class B12xMLASparseMetadataBuilder(
             accepted.fill_(1)
 
 
-@triton.jit
+# Token count only bounds the final tile; prompt remainders share one binary.
+@triton.jit(do_not_specialize=["NUM_TOKENS"])
 def _glm_device_token_metadata_kernel(
     query_start_loc,
     seq_lens,
     request_ids,
     causal_lens,
     NUM_REQS: tl.constexpr,
-    NUM_TOKENS: tl.constexpr,
+    NUM_TOKENS,
     SEARCH_STEPS: tl.constexpr,
     DCP_SIZE: tl.constexpr,
     DCP_RANK: tl.constexpr,
