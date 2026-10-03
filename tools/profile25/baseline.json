@@ -1,0 +1,47 @@
+{
+  "baseline_image": "technigmaai/glm-5.3-flash-nvfp4-2x-dgx-sparks@sha256:1169f797539454e3c286557d49fddd488488957d9a3f10638b01052998370622",
+  "source_base": "22476af54c637cbb7c7d8193addd160da83a5ce3",
+  "runtime_overlays": [
+    {
+      "path": "vllm/models/deepseek_v32/attention.py",
+      "sha256": "35781670cc16f0f02c051a0ef9c2a8b9e1c49ea402b1acfe72a4b12f7a1a03b9",
+      "checkout_sha256": "35781670cc16f0f02c051a0ef9c2a8b9e1c49ea402b1acfe72a4b12f7a1a03b9"
+    },
+    {
+      "path": "vllm/models/glm5next/common/attention.py",
+      "sha256": "4c4e7cdc9b6565bcf8d53387edc29d130eedd044427e75bf3a446a3c657709d6",
+      "checkout_sha256": "4c4e7cdc9b6565bcf8d53387edc29d130eedd044427e75bf3a446a3c657709d6"
+    },
+    {
+      "path": "vllm/models/glm5next/nvidia/ops/kpool_compress.py",
+      "sha256": "06a574eddf136e80f344c743f06a0abda55ff487735be6b91bb9c1c0b861bb3e",
+      "checkout_sha256": "06a574eddf136e80f344c743f06a0abda55ff487735be6b91bb9c1c0b861bb3e"
+    },
+    {
+      "path": "vllm/model_executor/layers/attention/sparse_mla_attention.py",
+      "sha256": "6a03271a6438083e3fe01dbfd3d2fffaeed6874796c8cbb8d668df1126a6f79c",
+      "checkout_sha256": "6a03271a6438083e3fe01dbfd3d2fffaeed6874796c8cbb8d668df1126a6f79c"
+    },
+    {
+      "path": "vllm/v1/worker/utils.py",
+      "sha256": "f8030342c9d02e95b737dd6f04dd5e4a3e2b409000460038e32ec4885b19bbf1",
+      "checkout_sha256": "dd2bb8ad51dfd694e460bf6d46a346c810e7787615c07065983952fc88e566a0"
+    },
+    {
+      "path": "vllm/v1/executor/multiproc_executor.py",
+      "sha256": "86a5415fb39632e53738175392571190512ab45c52b2004d340d0b4de23d5d6c",
+      "checkout_sha256": "86a5415fb39632e53738175392571190512ab45c52b2004d340d0b4de23d5d6c"
+    },
+    {
+      "path": "vllm/v1/attention/backends/mla/flashinfer_mla_sparse.py",
+      "sha256": "c86f67e11f9c8d6e69c67bf64fb422ede51f0c2f7da05784117d8c60b5f6b165",
+      "checkout_sha256": "c86f67e11f9c8d6e69c67bf64fb422ede51f0c2f7da05784117d8c60b5f6b165"
+    },
+    {
+      "path": "vllm/v1/attention/backends/mla/flashattn_mla_sparse.py",
+      "sha256": "3267e8a298242d7131e54968ca160981d8a528c3d50662dfcb9216e6be44e2ad",
+      "checkout_sha256": "3267e8a298242d7131e54968ca160981d8a528c3d50662dfcb9216e6be44e2ad"
+    }
+  ],
+  "note": "Exact installed Python overlays from Technigma R28.8-A; native libraries and separately installed dependencies are reused from the digest-pinned image. Repository lint adds one blank line after the Display-KV import; checkout and installed hashes are both recorded."
+}
