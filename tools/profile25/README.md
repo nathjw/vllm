@@ -1,5 +1,11 @@
 # Profile 25: pinned Technigma baseline
 
+The maintained optional bundle is on `profile25/proven-fixes`. Its
+[included fixes, evidence, deployment contract and maintenance rules](proven-fixes.md)
+and [seven-file hash manifest](proven-fixes.json) combine the qualified metadata
+fix with exact GLM history preservation. Launchers pin an immutable commit;
+experimental performance settings are excluded.
+
 This branch starts from local-inference-lab/vllm at
 `22476af54c637cbb7c7d8193addd160da83a5ce3` and preserves the eight Python files
 that differ in the installed Technigma R28.8-A image. `baseline.json` records
