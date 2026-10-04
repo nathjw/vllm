@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "branch": "profile25/proven-fixes",
+  "base_image": "technigmaai/glm-5.3-flash-nvfp4-2x-dgx-sparks@sha256:1169f797539454e3c286557d49fddd488488957d9a3f10638b01052998370622",
+  "base_image_id": "sha256:a4dc62d34e6f28dbbeef6f0f233e93198cb6f7978694c09fa2648e19c2b9b48b",
+  "source_base": "22476af54c637cbb7c7d8193addd160da83a5ce3",
+  "model": "local-inference-lab/GLM-5.3-Flash-NVFP4-Spark",
+  "model_revision": "a608241037e4c2565356bff7ca293f2133888f88",
+  "included_commits": {
+    "metadata": "88ea13c933df1894db6cd03fb080cdace668be1d",
+    "history_parser": "9f65820e95c23979b36d64e618d993129b3c597b",
+    "history_template_and_evidence": "77af8000d2541b161d5d31365ea8af889f0a65ba"
+  },
+  "overlays": [
+    {
+      "source": "vllm/v1/attention/backends/mla/b12x_mla_sparse.py",
+      "target": "/opt/venv/lib/python3.12/site-packages/vllm/v1/attention/backends/mla/b12x_mla_sparse.py",
+      "sha256": "35fe1bf3b77f997a2cb89aa078d50e2bd046eed8eec24b3a6887b1c6d39f8a39"
+    },
+    {
+      "source": "vllm/parser/abstract_parser.py",
+      "target": "/opt/venv/lib/python3.12/site-packages/vllm/parser/abstract_parser.py",
+      "sha256": "bf62ef62541d8c77c3f09979c35dc4c7150fb5554bc3377d3b8689524eac2e74"
+    },
+    {
+      "source": "vllm/parser/engine/adapters.py",
+      "target": "/opt/venv/lib/python3.12/site-packages/vllm/parser/engine/adapters.py",
+      "sha256": "beb7d4df5452e5bd67143f4e95777fb6cbb7cff49077887be1d02b20d7860600"
+    },
+    {
+      "source": "vllm/parser/engine/parser_engine.py",
+      "target": "/opt/venv/lib/python3.12/site-packages/vllm/parser/engine/parser_engine.py",
+      "sha256": "c277dac977c6ba3d817e2f444521991bb9f46a658243a3e629081bf1168d7999"
+    },
+    {
+      "source": "vllm/parser/glm47_moe.py",
+      "target": "/opt/venv/lib/python3.12/site-packages/vllm/parser/glm47_moe.py",
+      "sha256": "18c6710da4456be28c685202664f32d30eabdeda9c79b4e622df0f32a32da657"
+    },
+    {
+      "source": "vllm/tool_parsers/abstract_tool_parser.py",
+      "target": "/opt/venv/lib/python3.12/site-packages/vllm/tool_parsers/abstract_tool_parser.py",
+      "sha256": "ebb5eac1eb326bc865cd632043e773dbd7fedc34635194ecec084c57cac561af"
+    },
+    {
+      "source": "tools/profile25/chat_template_verbatim.jinja",
+      "target": "/opt/glm53/chat_template.jinja",
+      "sha256": "688487bcf8d08c2c0945242c93988bca1a5657d79c9e23664259fb0858976770"
+    }
+  ]
+}
