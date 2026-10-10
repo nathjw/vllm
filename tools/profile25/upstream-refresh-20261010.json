@@ -1,0 +1,65 @@
+{
+  "checked_at_utc": "2026-10-10",
+  "source_revision": "760d2d817ed43591cf546921e247f2f1d4156828",
+  "source_tree": "65b587fe071bebca51f858d10b4746e300acb457",
+  "upstream_revision": "19f2c20ed4d64ae22bd009ceacadd85e2a81e354",
+  "upstream_branch": "integration/karmic-kraken-beta",
+  "base_source": "22476af54c637cbb7c7d8193addd160da83a5ce3",
+  "base_image": "technigmaai/glm-5.3-flash-nvfp4-2x-dgx-sparks@sha256:1169f797539454e3c286557d49fddd488488957d9a3f10638b01052998370622",
+  "packages": [
+    "https://github.com/local-inference-lab/flashinfer/releases/download/flashinfer-cu134-sm120-beta-b4c35e6ec1d712f6b832679c08ce5719fae57cd6/flashinfer_python-0.7.1%2Blil.cu134.sm120.gb4c35e6ec1d7-py3-none-any.whl#sha256=eabea9411e1d4e1a811510355802f561e53d2226412206c698e1ac41b7ebc13b",
+    "nvidia-cutlass-dsl[cu13]==4.7.1",
+    "nvidia-cutlass-dsl-libs-base==4.7.1",
+    "nvidia-cutlass-dsl-libs-core==4.7.1",
+    "nvidia-cutlass-dsl-libs-cu12==4.7.1",
+    "nvidia-cutlass-dsl-libs-cu13==4.7.1",
+    "quack-kernels==0.6.5",
+    "nccl4py==0.4.1",
+    "nccl-extensions==0.1.0",
+    "nvidia-cudnn-frontend==1.30.0"
+  ],
+  "flashinfer_source": "b4c35e6ec1d712f6b832679c08ce5719fae57cd6",
+  "flashinfer_wheel_sha256": "eabea9411e1d4e1a811510355802f561e53d2226412206c698e1ac41b7ebc13b",
+  "native_source_unchanged": [
+    "csrc",
+    "CMakeLists.txt",
+    "cmake",
+    "requirements/build"
+  ],
+  "common_dependency_spec_unchanged": [
+    "requirements/common.txt",
+    "pyproject.toml"
+  ],
+  "archive_sha256": "05387fb09f2e7cfb6f505128543ae026e1d74eaee82e7a30851f6e5d14eeefee",
+  "runtime_version": "0.1.dev1+g760d2d817ed4.profile25",
+  "base_published_version": "0.1.dev1+ga7b41c45a.d20260926.cu134",
+  "runtime_version_basis": "Preserved vendor image version prefix; new full-source commit suffix",
+  "dockerfile_sha256": "8ae9dc481f8e36412f1793623bc4d5ea1d0265aad76b0e46485c1886f5eb472e",
+  "tag": "profile25-proven-fixes:upstream-20261010",
+  "image_id": "sha256:c81dc93312d7d68fa46233eb052869881c9822b9df386078cdf5242bed354db3",
+  "runtime_source_file_count": 3191,
+  "native_extension_file_count": 11,
+  "cpu_regression": {
+    "passed": 265,
+    "warnings": 46,
+    "seconds": 20.55,
+    "gpu_devices_exposed": false,
+    "python_overlays_mounted": false,
+    "template_sha256": "688487bcf8d08c2c0945242c93988bca1a5657d79c9e23664259fb0858976770"
+  },
+  "stock_cli": {
+    "ranks": [
+      0,
+      1
+    ],
+    "arguments_parsed": true,
+    "tensor_parallel_size": 2,
+    "mtp_tokens": 3,
+    "draft_sample_method": "greedy",
+    "rejection_sample_method": "standard",
+    "gpu_devices_exposed": false,
+    "argument_parser_platform": "cpu",
+    "model_weights_loaded": false
+  },
+  "qualification_limit": "CPU-only qualification. Two-node GPU startup, live history smoke and hard tool-eval are required and recorded separately after deployment."
+}

@@ -6,11 +6,18 @@ history preservation, using the existing model and runtime. Launchers select
 an immutable commit from this branch and verify the accompanying
 [overlay manifest](proven-fixes.json).
 
-The branch starts from `77af8000d2541b161d5d31365ea8af889f0a65ba`, which
-already contains metadata commit `88ea13c933df1894db6cd03fb080cdace668be1d`.
-The consolidation introduces a manifest and documentation only. Its six
-runtime Python files and exact candidate template retain their previously
-qualified bytes. Historical experiment branches remain available as evidence.
+The October 10 refresh re-stacks the vendor compatibility changes and metadata
+fix onto `integration/karmic-kraken-beta` at
+`19f2c20ed4d64ae22bd009ceacadd85e2a81e354`. That upstream already contains the
+exact parser/history repair and regression tests. The verbatim assistant
+template is preserved. The original release
+`6328df0da1ba99f8b84d334217ef061e491aa186` remains an ancestor and is preserved
+under an archive ref; historical experiment branches remain available.
+
+The fork's literal `main` at `47ccf6c57d92f03630ebcbad3809450545825488` is
+dated August 30 and lacks GLM5Next/B12X model support. The supported integration
+branch above is dated October 8 and is the current source base for this runtime.
+It is the compatible upstream target; literal `main` cannot run this model.
 
 ## Included fixes and evidence
 
@@ -56,7 +63,7 @@ Use this registry reference:
 technigmaai/glm-5.3-flash-nvfp4-2x-dgx-sparks@sha256:1169f797539454e3c286557d49fddd488488957d9a3f10638b01052998370622
 ```
 
-The qualified ARM64 local image ID is:
+The original qualified ARM64 local image ID is:
 
 ```text
 sha256:a4dc62d34e6f28dbbeef6f0f233e93198cb6f7978694c09fa2648e19c2b9b48b
@@ -64,32 +71,56 @@ sha256:a4dc62d34e6f28dbbeef6f0f233e93198cb6f7978694c09fa2648e19c2b9b48b
 
 The model is `local-inference-lab/GLM-5.3-Flash-NVFP4-Spark` at revision
 `a608241037e4c2565356bff7ca293f2133888f88`. The image supplies its existing
-native extensions, B12X, FlashInfer, communication stack, installed Python
-overlays and Display-KV. The source lineage is
-`22476af54c637cbb7c7d8193addd160da83a5ce3`; [baseline.json](baseline.json)
-records the preserved Technigma image overlays.
+native extensions, CUDA 13.4, NVIDIA PyTorch 2.14, communication stack and
+Display-KV. The new schema-2 manifest selects a separate immutable runtime
+image with the complete refreshed vLLM Python source. Its native source,
+CMake/build inputs and common dependency specification are unchanged from
+`22476af54c637cbb7c7d8193addd160da83a5ce3`; this preserves the vendor native
+ABI instead of resolving vanilla PyPI PyTorch. [baseline.json](baseline.json)
+records the original Technigma compatibility adaptations.
 
-Apply exactly the following seven read-only file bindings on both nodes.
-Here, `SITE` means `/opt/venv/lib/python3.12/site-packages`; every source is
-relative to the selected fork commit. The JSON manifest records full absolute
-container targets and SHA256 hashes of the source bytes.
+FlashInfer/B12X comes from the supported integration fork at
+`b4c35e6ec1d712f6b832679c08ce5719fae57cd6`, using its hash-verified
+`0.7.1+lil.cu134.sm120.gb4c35e6ec1d7` platform-independent Python wheel.
+The ARM64 runtime lock specifies the same CUDA 13.4/NVIDIA PyTorch 2.14 ABI and
+CuTe DSL 4.7.1. SM120/x86 precompiled JIT-cache wheels are deliberately not used
+on SM121/ARM64. Runtime kernel compilation uses the retained SM121 settings.
+The matching CuTe 4.7.1 library packages, Quack 0.6.5 and required dependency
+updates are recorded in the companion image-build receipt.
+
+The refreshed runtime image ID is
+`sha256:c81dc93312d7d68fa46233eb052869881c9822b9df386078cdf5242bed354db3`.
+Its source is `760d2d817ed43591cf546921e247f2f1d4156828`, with vLLM tree
+`65b587fe071bebca51f858d10b4746e300acb457`. Package version
+`0.1.dev1+g760d2d817ed4.profile25` preserves the actual publisher's
+`0.1.dev1+ga7b41c45a.d20260926.cu134` version prefix and replaces only stale
+build metadata; it does not claim a vanilla vLLM release number. The complete
+source hashes, not the version string alone, identify the deployed code.
+
+The [refresh receipt](upstream-refresh-20261010.json) records 265 passing
+CPU parser/serving tests and successful parsing of both stock rank commands.
+These checks expose no GPUs and load no model weights. Fresh two-node startup,
+live history and hard tool-eval evidence are recorded separately; the earlier
+performance/quality numbers above are not results of this upstream refresh.
+
+Schema 2 installs the full source tree in its immutable image and mounts only
+the exact verbatim template read-only on both nodes. The manifest records
+the source revision/tree, all committed source SHA256 hashes, preserved native
+extension hashes and immutable image ID. Preflight reads and verifies the
+actual installed files in CPU-only containers, as well as source labels.
 
 | Repository source | Container target |
 | --- | --- |
-| `vllm/v1/attention/backends/mla/b12x_mla_sparse.py` | `SITE/vllm/v1/attention/backends/mla/b12x_mla_sparse.py` |
-| `vllm/parser/abstract_parser.py` | `SITE/vllm/parser/abstract_parser.py` |
-| `vllm/parser/engine/adapters.py` | `SITE/vllm/parser/engine/adapters.py` |
-| `vllm/parser/engine/parser_engine.py` | `SITE/vllm/parser/engine/parser_engine.py` |
-| `vllm/parser/glm47_moe.py` | `SITE/vllm/parser/glm47_moe.py` |
-| `vllm/tool_parsers/abstract_tool_parser.py` | `SITE/vllm/tool_parsers/abstract_tool_parser.py` |
 | `tools/profile25/chat_template_verbatim.jinja` | `/opt/glm53/chat_template.jinja` |
 
 Retain `--chat-template /opt/glm53/chat_template.jinja` and the stock recipe's
 model, precision, standard verification, MTP3 policy, scheduler, graph ladder,
 cache allocation and communication settings. There are no experimental
 performance settings in this manifest. The launcher reads committed bytes,
-verifies their hashes, and mounts individual files into the pinned image.
-It preserves unrelated installed packages and runtime files.
+verifies their hashes, and mounts the template into the pinned full-source
+image. It uses caches scoped by source-tree ID to retain the old cache state.
+The helper still supports the original schema-1 seven-file overlay manifest
+when rolling back to the previous source pin and image.
 
 The maintained companion launcher and its combined runtime validation are
 owned by the
